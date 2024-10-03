@@ -228,7 +228,7 @@ impl<T, const C: usize> Image<T, C> {
     /// If the channel index is out of bounds, an error is returned.
     pub fn channel(&self, channel: usize) -> Result<Image<T, 1>, ImageError>
     where
-        T: Clone + Copy, // TODO: remove this bound
+        T: Clone,
     {
         if channel >= C {
             return Err(ImageError::ChannelIndexOutOfBounds(channel, C));
@@ -241,7 +241,7 @@ impl<T, const C: usize> Image<T, C> {
         //        channel_data.push(*self.get_unchecked([y, x, channel]));
         //    }
         //}
-        let channel_data = self.as_slice().chunks(C).nth(channel).unwrap().to_vec();
+        let channel_data = self.as_slice().iter().skip(channel).step_by(C).map(|x| x.clone()).collect();
 
         Image::new(self.size(), channel_data)
     }
