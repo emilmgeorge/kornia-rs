@@ -225,12 +225,13 @@ where
 /// A new `TensorStorage` instance with cloned data if successful, otherwise an error.
 impl<T, A> Clone for TensorStorage<T, A>
 where
+    T: Clone,
     A: TensorAllocator + Clone + 'static,
 {
     fn clone(&self) -> Self {
-        Self {
-            buffer: self.buffer.clone(),
-        }
+        let mut new_storage = Self::new(self.buffer.len, self.alloc().clone()).expect("Tensor Allocation Error");
+        new_storage.as_mut_slice().clone_from_slice(self.as_slice());
+        new_storage
     }
 }
 
